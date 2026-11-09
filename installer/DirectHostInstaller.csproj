@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Standalone installer (no mod manager). Build it with build.ps1: it prepares obj\payload.zip and obj\icon.ico. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>DirectHostInstaller</AssemblyName>
+    <RootNamespace>DirectHostInstaller</RootNamespace>
+    <Version>0.0.0</Version>
+    <Product>REPO DirectHost installer</Product>
+    <AssemblyTitle>REPO DirectHost installer</AssemblyTitle>
+    <Description>Installs BepInEx 5 and REPO DirectHost into the R.E.P.O. game folder</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PayloadZip Condition="'$(PayloadZip)' == ''">$(MSBuildProjectDirectory)\obj\payload.zip</PayloadZip>
+    <ApplicationIcon Condition="Exists('$(MSBuildProjectDirectory)\obj\icon.ico')">$(MSBuildProjectDirectory)\obj\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <EmbeddedResource Include="$(PayloadZip)" LogicalName="payload.zip" />
+  </ItemGroup>
+
+</Project>

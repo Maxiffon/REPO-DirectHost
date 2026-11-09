@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+# private research notes (local paths, notes on decompiled game DLLs)
+docs/
+# full-size source of package/icon.png
+package/icon-source.webp
