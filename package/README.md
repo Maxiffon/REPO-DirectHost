@@ -1,4 +1,4 @@
-# REPO DirectHost 1.0.0
+# REPO DirectHost 1.0.1
 
 The Steam lobby host runs a Photon server inside the game. Friends connect to it by the best available path,
 chosen automatically when they enter the Steam lobby (no configuration):
@@ -9,7 +9,8 @@ chosen automatically when they enter the Steam lobby (no configuration):
      and open a direct UDP link from both sides. It works even when only one side is "open", e.g. a host behind
      CGNAT and a player with a forwarded port (UDP 7779 is tried first on the player's side);
    - **Steam P2P**: Steam's own punch-through.
-   The faster of the two is used.
+   The faster of the two is used; if the punched link turns out slower than even the Steam relay (e.g. the traffic
+   takes a VPN detour), the relay is used instead.
 3. **Virtual LAN** — Radmin VPN / ZeroTier / Hamachi / Tailscale, if both players are in the same network.
 4. **Steam relay** — Valve's relays, only when nothing else works (or when it is clearly faster than the virtual LAN).
 

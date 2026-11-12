@@ -13,7 +13,7 @@ namespace RepoDirectHost
     {
         public const string Guid = "kot.repo.directhost";
         public const string Name = "REPO DirectHost";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<string> HostAddress, PublicAddress, Route;

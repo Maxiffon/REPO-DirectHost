@@ -27,7 +27,8 @@ Chosen automatically when a player enters the Steam lobby:
      open a direct UDP link from both sides (works even when only one side is "open");
    - **Steam P2P** — Steam's own punch-through.
 
-   The faster of the two is used.
+   The faster of the two is used; if the punched link turns out slower than even the Steam relay (e.g. the traffic
+   takes a VPN detour), the relay is used instead.
 3. **Virtual LAN** — Radmin VPN / ZeroTier / Hamachi / Tailscale, if both players are in the same network.
 4. **Steam relay** — Valve's relays, only when nothing else works.
 

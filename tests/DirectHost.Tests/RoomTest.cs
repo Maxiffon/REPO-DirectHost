@@ -68,11 +68,12 @@ internal static class RoomTest
             Log = s => serverLog.Enqueue(s),
             Warn = s => serverLog.Enqueue("WARN " + s)
         };
-        udp = new UdpServer(photon, IPAddress.Loopback, (7777, Role.Master), (7778, Role.Game)) { Log = s => serverLog.Enqueue(s), OnError = e => serverLog.Enqueue("ERROR " + e) };
+        // Not 7777/7778: a running game holds those exclusively.
+        udp = new UdpServer(photon, IPAddress.Loopback, (37777, Role.Master), (37778, Role.Game)) { Log = s => serverLog.Enqueue(s), OnError = e => serverLog.Enqueue("ERROR " + e) };
         udp.Tick = photon.Tick;
         udp.Start();
-        using var pm = new LossyProxy(17777, 7777, loss);
-        using var pg = new LossyProxy(17778, 7778, loss);
+        using var pm = new LossyProxy(17777, 37777, loss);
+        using var pg = new LossyProxy(17778, 37778, loss);
         bool ok = true;
         try
         {

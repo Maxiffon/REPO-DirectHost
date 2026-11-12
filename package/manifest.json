@@ -1,6 +1,6 @@
 {
   "name": "REPO_DirectHost",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/Maxiffon/REPO-DirectHost",
   "description": "Own in-game Photon server. Best path picked automatically: public IP/LAN > own NAT punch-through / Steam P2P > Radmin/ZeroTier > Steam relay. Replaces Makfly REPO_Steam_P2P (do not use both).",
   "dependencies": [

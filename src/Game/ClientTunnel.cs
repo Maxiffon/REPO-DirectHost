@@ -1,8 +1,8 @@
 // REPO DirectHost — the client's tunnel to the host. Photon (PUN + Voice) talks to two loopback ports (TunnelClient);
 // the datagrams travel over the best of up to two links, re-chosen every second:
 //   * the own NAT punch link (direct UDP, Net/Punch.cs) — preferred whenever it is up;
-//   * the Steam link (Steam P2P via ICE, or Valve's relay) — the fallback, or used when Steam's own direct path is
-//     clearly faster than the punch link.
+//   * the Steam link (Steam P2P via ICE, or Valve's relay) — the fallback, or used when it is clearly faster than the
+//     punch link (which can happen when the punch traffic takes a VPN detour).
 // Switching links mid-game does not disturb the Photon connection (the host keys sessions by player, see Tunnel.cs).
 using System;
 using System.Net;
@@ -29,7 +29,10 @@ namespace RepoDirectHost.Game
         private DateTime _nextRetry, _nextReport;
         private Lobby _lobby;
         private string _published, _lastKind;
-        private int _checkAt;
+        // Not Environment.TickCount: it turns negative after 24.9 days of uptime (Fast Startup keeps counting across
+        // "shutdowns"), and "TickCount - 0 < 100" then held forever, so the punch data was never published.
+        private readonly System.Diagnostics.Stopwatch _clock = System.Diagnostics.Stopwatch.StartNew();
+        private long _checkAt = -1000;
 
         public ClientTunnel(SteamId host, bool steam, HostCandidates punchTo, Lobby lobby)
         {
@@ -123,8 +126,8 @@ namespace RepoDirectHost.Game
         public void Frame()
         {
             var p = _punch;
-            if (p == null || Environment.TickCount - _checkAt < 100) return;
-            _checkAt = Environment.TickCount;
+            if (p == null || _clock.ElapsedMilliseconds - _checkAt < 100) return;
+            _checkAt = _clock.ElapsedMilliseconds;
             string v = p.MemberValue();
             if (v == null || v == _published) return;
             try
@@ -177,7 +180,11 @@ namespace RepoDirectHost.Game
 
             bool punchUp = GetPunch(out int prtt);
             bool steamUp = GetSteamRoute(out int sping, out bool relayed);
-            _preferSteam = punchUp && steamUp && !relayed && sping > 0 && prtt > 0 && sping + 15 < prtt;
+            // The punch link is direct, but not always the fastest: through a VPN or a long detour it can be slower even
+            // than Valve's relay (seen: punch 170 ms, relay 115 ms). Steam takes over when it is clearly faster (a wider
+            // margin for the relay, whose ping wanders more), and gives the link back only once the punch has caught up.
+            bool both = punchUp && steamUp && sping > 0 && prtt > 0;
+            _preferSteam = both && (_preferSteam ? prtt > sping + 5 : prtt > sping + (relayed ? 30 : 15));
             string kind, path;
             if (punchUp && !_preferSteam) { kind = "punch"; path = $"DIRECT (own NAT punch-through), ping {prtt} ms"; }
             else if (steamUp) { kind = relayed ? "relay" : "p2p"; path = $"Steam, ping {sping} ms, {(relayed ? "via Steam relay" : "direct P2P")}"; }
